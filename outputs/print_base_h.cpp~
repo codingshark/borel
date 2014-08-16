@@ -1,0 +1,112 @@
+#include "print_base_h.h"
+#include <iostream>
+print_base_h::print_base_h()
+{
+}
+print_base_h::print_base_h(const print_base_h & a_print_base_h)
+{
+	upper_name1 = a_print_base_h.upper_name1;
+	upper_name4 = a_print_base_h.upper_name4;
+	class_name9 = a_print_base_h.class_name9;
+	class_name13 = a_print_base_h.class_name13;
+	class_name15 = a_print_base_h.class_name15;
+	class_name17 = a_print_base_h.class_name17;
+	class_name19 = a_print_base_h.class_name19;
+	class_name22 = a_print_base_h.class_name22;
+	class_name25 = a_print_base_h.class_name25;
+	class_name27 = a_print_base_h.class_name27;
+	class_name29 = a_print_base_h.class_name29;
+	class_name33 = a_print_base_h.class_name33;
+}
+print_base_h::~print_base_h()
+{
+}
+print_base_h & print_base_h::operator = (const print_base_h & a_print_base_h)
+{
+	upper_name1 = a_print_base_h.upper_name1;
+	upper_name4 = a_print_base_h.upper_name4;
+	class_name9 = a_print_base_h.class_name9;
+	class_name13 = a_print_base_h.class_name13;
+	class_name15 = a_print_base_h.class_name15;
+	class_name17 = a_print_base_h.class_name17;
+	class_name19 = a_print_base_h.class_name19;
+	class_name22 = a_print_base_h.class_name22;
+	class_name25 = a_print_base_h.class_name25;
+	class_name27 = a_print_base_h.class_name27;
+	class_name29 = a_print_base_h.class_name29;
+	class_name33 = a_print_base_h.class_name33;
+}
+void print_base_h::print_this(std::ostream & out)
+{
+	out<<"#ifndef ";
+	out<< upper_name1;
+	out<<"_H_\n";
+	out<<"#define ";
+	out<< upper_name4;
+	out<<"_H_\n";
+	out<<"#include <iostream>\n";
+	out<<"#include \"symbol_base.h\"\n";
+	out<<"class ";
+	out<< class_name9;
+	out<<" :public symbol_base\n";
+	out<<"{";
+	out<<"\tpublic:\n";
+	out<< class_name13;
+	out<<"(){};\n";
+	out<< class_name15;
+	out<<"(const ";
+	out<< class_name17;
+	out<<" & a_";
+	out<< class_name19;
+	out<<"){}\n";
+	out<<"virtual ~";
+	out<< class_name22;
+	out<<"(){};\n";
+	out<<"virtual ";
+	out<< class_name25;
+	out<<"& operator = (const ";
+	out<< class_name27;
+	out<<" & a_";
+	out<< class_name29;
+	out<<"){};\n";
+	out<<"virtual void print_this(std::ostream & out){};\n";
+	out<<"virtual ";
+	out<< class_name33;
+	out<<" * duplicate(){}\n";
+	out<<"};\n";
+	out<<"#endif\n\n";
+}
+
+void print_base_h::setprint_base_h(, const string & a_upper_name1, const string & a_upper_name4, const string & a_class_name9, const string & a_class_name13, const string & a_class_name15, const string & a_class_name17, const string & a_class_name19, const string & a_class_name22, const string & a_class_name25, const string & a_class_name27, const string & a_class_name29, const string & a_class_name33)
+{
+	upper_name1 =	a_upper_name1;
+	upper_name4 =	a_upper_name4;
+	class_name9 =	a_class_name9;
+	class_name13 =	a_class_name13;
+	class_name15 =	a_class_name15;
+	class_name17 =	a_class_name17;
+	class_name19 =	a_class_name19;
+	class_name22 =	a_class_name22;
+	class_name25 =	a_class_name25;
+	class_name27 =	a_class_name27;
+	class_name29 =	a_class_name29;
+	class_name33 =	a_class_name33;
+}
+
+print_base_h * print_base_h::duplicate()
+{
+	print_base_h * a_copy = new print_base_h;
+	a_copy->upper_name1 = upper_name1;
+	a_copy->upper_name4 = upper_name4;
+	a_copy->class_name9 = class_name9;
+	a_copy->class_name13 = class_name13;
+	a_copy->class_name15 = class_name15;
+	a_copy->class_name17 = class_name17;
+	a_copy->class_name19 = class_name19;
+	a_copy->class_name22 = class_name22;
+	a_copy->class_name25 = class_name25;
+	a_copy->class_name27 = class_name27;
+	a_copy->class_name29 = class_name29;
+	a_copy->class_name33 = class_name33;
+	return a_copy;
+}

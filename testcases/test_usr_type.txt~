@@ -1,0 +1,25 @@
+
+<>
+<  >//spaces
+<  fj>//leading space
+
+<	>// \t
+<	ll>//leading tab
+
+<
+>// \n
+<
+ss>//leading new line
+
+< 	
+	 >//compond leading non-printable
+
+<hfdshjk>
+
+<string *>
+<list<int>>
+<hfisjiuef&*^*&%^$#%$#*())+(()&(*&%^%#!@#$42y{}|:"P?.,/;lp][[p]\>
+
+<cout<<""> //error
+<cin>>s> //error
+

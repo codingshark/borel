@@ -1,0 +1,27 @@
+
+
+//%type <int> root1
+%type <> root1
+%type <> child1
+//%type <string *> child1
+//%type <const dgsh> child2
+
+//%token <list<string>> child2
+
+//%token <list> child2
+%token <> child2
+
+root1:
+	child1 	child2 //comment
+|	child3
+	;
+
+//comment
+
+
+chil1:
+	child3
+	;
+
+chil2:
+	;

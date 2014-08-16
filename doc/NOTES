@@ -1,0 +1,10 @@
+Borel is directly dirived from lebesgue201111261013.
+Borel is a source generator generator
+
+Usage:
+1. Write script.y
+2. mkdir ./outputs
+3. ./borel ./scripts.y
+4. move(cut/past) head file including commands from glb_def.h to the head file included by classes using the generated sources.
+
+

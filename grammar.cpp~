@@ -1,0 +1,105 @@
+#include "grammar.h"
+
+#ifdef DEBUG
+#include <iostream>
+using std::endl;
+using std::cout;
+#endif
+
+grammar::grammar ()
+{
+}
+
+grammar::~grammar ()
+{
+}
+
+void grammar::insert_nonterminal(const string & a_name, int a_is_nullable)
+{
+	map<string, int>::iterator it= nonterminals.find(a_name);
+	if(it == nonterminals.end()) 
+	{
+		nonterminals.insert(map<string, int>::value_type(a_name, a_is_nullable));
+	}else
+	{//update the second value
+		it->second = a_is_nullable;
+	}
+}
+
+void grammar::insert_terminal(const string & a_name, const string & a_usr_type)
+{
+	map<string, string>::iterator it= terminals.find(a_name);
+	if(it == terminals.end()) 
+	{
+		terminals.insert(map<string, string>::value_type(a_name, a_usr_type));
+	}else
+	{//update the second value
+		it->second = a_usr_type;
+	}
+}
+
+int grammar::is_nullable(const string & a_name) const
+{
+	map<string, int>::const_iterator it= nonterminals.find(a_name);
+	if(it == nonterminals.end()) 
+	{
+		return -1;
+	}
+	return it->second;
+}
+
+string grammar::get_usr_type(const string & a_name) const
+{
+	map<string, string>::const_iterator it= terminals.find(a_name);
+	if(it == terminals.end()) 
+	{
+		return "";
+	}
+	return it->second;
+}
+
+int grammar::is_terminal_symbol(const string & a_name) const
+{
+	map<string, string>::const_iterator it= terminals.find(a_name);
+	if(it == terminals.end()) 
+	{
+		return 0;
+	}
+	return 1;
+}
+
+int grammar::is_nonterminal_symbol(const string & a_name) const
+{
+	map<string, int>::const_iterator it= nonterminals.find(a_name);
+	if(it == nonterminals.end()) 
+	{
+		return 0;
+	}
+	return 1;
+}
+		
+#ifdef DEBUG
+
+void grammar::print_grammar() const
+{
+	cout<<"============================="<<endl;
+	cout<<"start symbol:\t"<<start<<endl;
+	cout<<"non-terminals (name, is_nullable):\n\t";
+	for (map<string, int>::const_iterator it = nonterminals.begin(); it != nonterminals.end(); it++)
+	{
+		cout<<"("<<it->first<<","<<it->second<<") ";
+	}
+	cout<<endl;
+	cout<<"terminals (name, usr_type):\n\t";
+	for (map<string, string>::const_iterator it = terminals.begin(); it != terminals.end(); it++)
+	{
+		cout<<"("<<it->first<<","<<it->second<<") ";
+	}
+	cout<<endl;
+	for (list<rule>::const_iterator it = rules.begin(); it != rules.end(); it ++)
+	{
+		it->print_rule();
+	}
+	cout<<"============================="<<endl;
+}
+#endif

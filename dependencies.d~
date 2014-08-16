@@ -1,0 +1,5 @@
+node.o: node.cpp node.h
+node_list.o: node_list.cpp node_list.h node.h
+parser.o: parser.cpp parser.h node.h node_list.h
+lebesgue.tab.o: lebesgue.tab.c parser.h node.h node_list.h
+lex.yy.o: lex.yy.c lebesgue.tab.h

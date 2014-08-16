@@ -1,0 +1,64 @@
+#ifndef PARSER_H_
+#define PARSER_H_
+
+#include <list>
+#include <string>
+#include <map>
+#include "rule.h"
+#include "grammar.h"
+
+using std::list;
+using std::string;
+using std::map;
+
+class parser
+{
+	public:
+		parser (grammar & a_list, list<string> & a_str_stack);
+		virtual ~parser ();
+
+		void on_grammar();
+		void on_type_list();
+		void on_token();
+		void on_type();
+		void on_node_list();
+		void on_node();
+		void on_branches();
+		void on_branches_empty();
+		void on_rules_id();
+		void on_rules_str();
+		
+		////handle sytax errors
+		void on_node_missing_colon();
+		void on_node_missing_semicolon();
+		void on_node_missing_colon_semicolon();
+//		void on_branches_missing_or();
+		void on_grammar_reversed();
+		void on_grammar_missing_nodes();
+		void on_grammar_missing_types();
+		////
+	
+	public:
+		struct var
+		{
+			var(const string & a_usr_type, int a_cfg_type);
+			~var();
+			var & operator = (const var & a_var);
+			string	usr_type;
+			int	cfg_type;
+		};
+	
+	protected:
+		void insert_map(const string & a_name, parser::var a_var);
+		parser::var get_symbol_type(const string & a_name);
+		string trim(const string & a_str);
+	private:
+		grammar & cfg;
+		list<string> & str_stack;
+		map<string, parser::var> symbol_type;
+	
+	private:
+		rule	tmp_rule;
+};
+
+#endif

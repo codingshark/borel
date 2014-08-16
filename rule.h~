@@ -1,0 +1,49 @@
+#ifndef RULE_H_
+#define RULE_H_
+
+#include <list>
+#include <vector>
+#include <string>
+
+using std::string;
+using std::list;
+using std::vector;
+
+#define RULE_UNKNOWN	0
+#define RULE_TYPE	1
+#define RULE_TOKEN	2
+
+#define RULE_STR	3	//a special type of terminal symbol
+
+class rule
+{
+	public:
+		rule ();
+		rule(const rule & a_rule);
+		virtual ~rule ();
+		
+		rule & operator = (const rule & a_rule);
+		
+		void clear();
+#ifdef	DEBUG
+		void print_rule() const;
+#endif
+
+	public:
+		struct symbol
+		{
+			symbol(const string & a_name, int a_cfg_type);
+			symbol(const symbol & a_symbol);
+			~symbol();
+			symbol & operator = (const symbol & a_symbol);
+			string	name;
+			int	cfg_type;
+		};
+	
+	public:
+		string	name;
+		list<list<rule::symbol> > productions;
+		vector<long int> has_code;//hash code of production rules
+};
+
+#endif

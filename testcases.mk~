@@ -1,0 +1,20 @@
+test2:
+	./borel ./testcases/test2.txt
+
+test3:
+	./borel ./testcases/test3.y
+
+test_str:
+	./borel ./testcases/test_str.txt
+
+test_type:
+	./borel ./testcases/test_usr_type.txt
+
+test_null:
+	./borel ./testcases/test_nullable.y
+
+test_bug:
+	./borel ./testcases/test_bugs.y
+
+gen_printer:
+	./borel ./testcases/printer.y

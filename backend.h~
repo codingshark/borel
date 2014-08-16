@@ -1,0 +1,30 @@
+#ifndef BACKEND_H_
+#define BACKEND_H_
+
+#include <locale>
+#include "grammar.h"
+#include "gen_interface.h"
+
+using std::map;
+using std::locale;
+
+class backend
+{
+	public:
+		backend (grammar & a_cfg);
+		virtual ~backend ();
+
+		void generate_output();
+
+	protected:
+		void initialize();
+		
+		void find_nullable();
+		void find_nonterminal_symbols();
+		void find_hash_code();
+	private:
+		gen_interface * gen;
+		grammar & cfg;
+};
+
+#endif

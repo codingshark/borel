@@ -1,0 +1,119 @@
+%{
+
+#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <list>
+#include "parser.h"
+#include "node_list.h"
+
+using std::string;
+using std::list;
+using std::cout;
+using std::endl;
+
+#ifdef YYLEX_PARAM
+int yylex (YYLEX_PARAM);
+#else
+int yylex ();
+#endif
+
+extern "C" int yyerror(const string & s);
+
+extern FILE * yyin;
+
+extern list<string> str_stack;
+
+node_list	nlist;
+parser		a_parser(nlist, str_stack);
+
+%}
+
+%union
+{
+	int stub;
+}
+
+%token <stub> IDENTIFIER
+%token <stub> TOKEN
+%token <stub> TYPE
+
+%type <stub> grammar
+
+%type <stub> type_list
+%type <stub> type
+
+%type <stub> node_list
+%type <stub> node
+%type <stub> branches
+%type <stub> rules
+
+%%
+
+grammar	:
+	type_list node_list	{cout<<"GRAMMAR:NODE_LIST TYPE_LIST"<<endl; a_parser.on_grammar();}
+//|	node_list type_list	{cout<<"GRAMMAR:TYPE_LIST NODE_LIST"<<endl;}
+	;
+
+type_list:
+	type_list type		{cout<<"TYPE_LIST:TYPE_LIST TYPE"<<endl; a_parser.on_type_list();}
+|	type			{cout<<"TYPE_LIST:TYPE"<<endl; a_parser.on_type_list();}
+	;
+	
+type	:
+	TOKEN	'<' IDENTIFIER '>' IDENTIFIER	{cout<<"TYPE:TOCKEN"<<endl; a_parser.on_token();}
+|	TYPE	'<' IDENTIFIER '>' IDENTIFIER	{cout<<"TYPE:TYPE"<<endl; a_parser.on_type();}
+|	TOKEN	'<' '>' IDENTIFIER	{cout<<"TYPE:TOCKEN EMPTY"<<endl; a_parser.on_token_empty();}
+|	TYPE	'<' '>' IDENTIFIER	{cout<<"TYPE:TYPE EMPTY"<<endl; a_parser.on_type_empty();}
+	;
+
+node_list:
+	node_list node		{cout<<"NODE_LIST:LIST NODE"<<endl; a_parser.on_node_list();}
+|	node			{cout<<"NODE_LIST:NODE"<<endl; a_parser.on_node_list();}
+	;
+
+node	:
+	IDENTIFIER ':' branches ';'		{cout<<"NODE"<<endl; a_parser.on_node();}
+	;
+
+branches:
+	branches '|' rules	{cout<<"BRANCHES:BRANCHES RULES"<<endl; a_parser.on_branches();}
+|	rules			{cout<<"BRANCHES:RULES"<<endl; a_parser.on_branches();}
+|				{cout<<"BRANCHES:EMPTY"<<endl; a_parser.on_branches_empty();}
+	;
+
+rules	:
+	rules IDENTIFIER	{cout<<"RULES:RULES ID"<<endl; a_parser.on_rules();}
+|	IDENTIFIER		{cout<<"RULES:ID"<<endl; a_parser.on_rules();}
+	;
+
+%%
+
+int yyerror(const string & s)
+{
+    cout<<s<<endl;
+    return 1;
+}
+
+main(int argc, char ** argv)
+{
+
+	if(argc != 2)
+	{
+		cout<<argv[0]<<" grammar file"<<endl;
+		return 0;
+	}
+
+	FILE *f = fopen(argv[1], "r");
+	if(!f) {
+		cout<<"\tERROR:cannot open grammar file!"<<endl;
+	}
+	yyin = f;
+	yyparse();
+
+	cout<<"finish parsing"<<endl;
+	fclose(f);
+
+	return 0;
+
+}

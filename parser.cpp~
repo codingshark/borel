@@ -1,0 +1,288 @@
+#include "parser.h"
+
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+parser::parser (grammar & a_list, list<string> & a_str_stack):cfg(a_list), str_stack(a_str_stack)
+{
+	need_push = 1;
+}
+
+parser:: ~parser ()
+{
+}
+
+void parser::insert_map(const string & a_name, parser::type_pair a_type_pair)
+{
+	map<string, parser::type_pair>::iterator it= symbol_types.find(a_name);
+	if(it == symbol_types.end()) 
+	{
+		symbol_types.insert(map<string, parser::type_pair>::value_type(a_name, a_type_pair));
+	}
+}
+
+parser::type_pair parser::get_symbol_type(const string & a_name)
+{
+	map<string, parser::type_pair>::iterator it= symbol_types.find(a_name);
+	if(it == symbol_types.end()) 
+	{
+		return parser::type_pair("", RULE_UNKNOWN);
+	}
+	return it->second;
+}
+
+string parser::trim(const string & a_str)
+{
+	unsigned int lpos = a_str.find_first_not_of(" \a\b\t\n\v\f\r");
+	if(lpos == string::npos)
+	{
+		return "";
+	}
+	unsigned int rpos = a_str.find_last_not_of(" \a\b\t\n\v\f\r");
+	return a_str.substr(lpos, rpos-lpos+1);
+}
+
+void parser::on_grammar()
+{
+
+	for (map<string, parser::type_pair>::iterator it = symbol_types.begin();
+	 it != symbol_types.end(); it ++)
+	{
+		if(it->second.cfg_type == RULE_TYPE)
+		{	
+			cfg.insert_nonterminal(it->first, 0);
+		}else if(it->second.cfg_type == RULE_TOKEN)
+		{
+			cfg.insert_terminal(it->first, it->second.usr_type);
+		}else
+		{
+			cout<<"***semantic error: "<<it->first<<" unknown type."<<endl;
+		}
+	}	
+	cfg.start = cfg.rules.front().name;
+}
+
+void parser::on_type_list()
+{
+
+}
+
+void parser::on_token()
+{
+	string term_name = trim(str_stack.back());
+	str_stack.pop_back();
+	string usr_type = trim(str_stack.back());
+	str_stack.pop_back();
+	
+	if(usr_type.length() == 0)
+	{
+		cout<<"***syntax error: %token <> "<<term_name<<", missing usr_type"<<endl;
+	}
+	insert_map(term_name, parser::type_pair(usr_type, RULE_TOKEN));
+	cfg.insert_nonterminal(term_name, usr_type);
+	
+}
+
+void parser::on_type()
+{
+	string nonterm_name = trim(str_stack.back());
+	str_stack.pop_back();
+	string usr_type = trim(str_stack.back());
+	str_stack.pop_back();
+	
+	if(usr_type.length() != 0)
+	{
+		cout<<"***syntax error: %type <"<<usr_type;
+		cout<<"> "<<nonterm_name<<", can not has a usr_type"<<endl;
+	}
+	insert_map(nonterm_name, parser::type_pair(usr_type, RULE_TYPE));
+	cfg.insert_nonterminal(nonterm_name, 0);
+}
+
+
+void parser::on_node_list()
+{
+
+}
+
+void parser::on_node()
+{
+	tmp_rule.name = trim(str_stack.back());
+	str_stack.pop_back();
+	
+	cfg.rules.push_back(tmp_rule);
+
+	if(cfg.is_nonterminal_symbol(tmp_rule.name) != RULE_TYPE)
+	{
+		cout<<"***semantic error: non-terminal symbol "<<tmp_rule.name<<" must declared with \"%type\"."<<endl;
+	}
+	
+	tmp_rule.clear();
+}
+
+void parser::on_branches()
+{
+	need_push = 1;
+}
+
+void parser::on_branches_empty()
+{
+	tmp_rule.productions.push_back(list<rule::symbol>());
+}
+
+void parser::on_rules_id()
+{
+	if(need_push)
+	{//initialize;
+		tmp_rule.productions.push_back(list<rule::symbol>());
+		need_push = 0;
+	}
+	string name = trim(str_stack.back());
+	str_stack.pop_back();
+	
+	int a_cfg_type = get_symbol_type(name).cfg_type;
+	if( a_cfg_type == RULE_TYPE)
+	{
+		tmp_rule.productions.back().push_back(rule::symbol(name, a_cfg_type));
+	}else if(a_cfg_type == RULE_TOKEN)
+	{
+		tmp_rule.productions.back().push_back(rule::symbol(name, a_cfg_type));
+	}else if(a_cfg_type == RULE_STR)
+	{
+		cout<<"***semantic error: "<<name<<" is not a non-terminal symbol."<<endl;
+	}else
+	{
+		tmp_rule.productions.back().push_back(rule::symbol(name, RULE_UNKNOWN));
+		cout<<"***semantic error: "<<name<<" unknown type."<<endl;
+	}
+	
+}
+
+
+void parser::on_rules_str()
+{
+	if(need_push)
+	{//initialize;
+		tmp_rule.productions.push_back(list<rule::symbol>());
+		need_push = 0;
+	}
+	tmp_rule.productions.back().push_back(rule::symbol(str_stack.back(), RULE_STR));
+	str_stack.pop_back();
+}
+
+parser::type_pair::type_pair(const string & a_usr_type, int a_cfg_type): 
+	usr_type(a_usr_type), cfg_type(a_cfg_type)
+{
+}
+
+parser::type_pair::~type_pair()
+{
+}
+
+parser::type_pair & parser::type_pair::operator = (const parser::type_pair & a_type_pair)
+{
+	usr_type = a_type_pair.usr_type;
+	cfg_type = a_type_pair.cfg_type;
+	return *this;
+}
+
+////handle sytax errors
+void parser::on_node_missing_colon()
+{
+	cout<<"***syntax error: missing \":\", near \""<<str_stack.back()<<"\""<<endl;
+
+	////////
+	//although error occurred, still try best to do something
+	tmp_rule.name = trim(str_stack.back());
+	str_stack.pop_back();
+	cfg.rules.push_back(tmp_rule);
+	
+	if(cfg.is_nonterminal_symbol(tmp_rule.name) != RULE_TYPE)
+	{
+		cout<<"***semantic error: non-terminal symbol "<<tmp_rule.name<<" must declared with \"%type\"."<<endl;
+	}
+	tmp_rule.clear();
+	////////
+}
+
+void parser::on_node_missing_semicolon()
+{
+	cout<<"***syntax error: missing \";\", near \""<<str_stack.back()<<"\""<<endl;
+	
+	////////
+	//although error occurred, still try best to continue
+	
+	tmp_rule.name = trim(str_stack.back());
+	str_stack.pop_back();
+	cfg.rules.push_back(tmp_rule);
+	
+	if(cfg.is_nonterminal_symbol(tmp_rule.name) != RULE_TYPE)
+	{
+		cout<<"***semantic error: non-terminal symbol "<<tmp_rule.name<<" must declared with \"%type\"."<<endl;
+	}
+	tmp_rule.clear();
+	////////
+}
+
+void parser::on_node_missing_colon_semicolon()
+{
+	cout<<"***syntax error: missing \":\" and \";\", near \""<<str_stack.back()<<"\""<<endl;
+	
+	////////
+	//although error occurred, still try best to continue
+	
+	tmp_rule.name = trim(str_stack.back());
+	str_stack.pop_back();
+	cfg.rules.push_back(tmp_rule);
+	
+	if(cfg.is_nonterminal_symbol(tmp_rule.name) != RULE_TYPE)
+	{
+		cout<<"***semantic error: non-terminal symbol "<<tmp_rule.name<<" must declared with \"%type\"."<<endl;
+	}
+	tmp_rule.clear();
+	////////
+}
+
+void parser::on_grammar_reversed()
+{
+	cout<<"***syntax error: %type and %token must declared before production rules."<<endl;
+	
+	////////
+	//although error occurred, still try best to continue
+	for (map<string, parser::type_pair>::iterator it = symbol_types.begin();
+	 it != symbol_types.end(); it ++)
+	{
+		if(it->second.cfg_type == RULE_TYPE)
+		{
+			cfg.insert_nonterminal(it->first, 0);
+		}else if(it->second.cfg_type == RULE_TOKEN)
+		{
+			cfg.insert_terminal(it->first, "");
+		}else
+		{
+			cout<<"***semantic error: "<<it->first<<" unknown type."<<endl;
+		}
+	}
+	cfg.start = cfg.rules.front().name;
+	////////
+}
+
+void parser::on_grammar_missing_nodes()
+{
+	cout<<"***syntax error: missing production rules"<<endl;
+}
+
+void parser::on_grammar_missing_types()
+{
+	cout<<"***syntax error: missing %type and %token declarations"<<endl;
+	
+	////////
+	//although error occurred, still try best to continue
+	cfg.start = cfg.rules.front().name;
+	////////
+}
+
+////
+

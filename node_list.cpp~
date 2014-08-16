@@ -1,0 +1,38 @@
+#include "node_list.h"
+
+node_list::node_list ()
+{
+}
+
+node_list::~node_list ()
+{
+}
+
+#ifdef DEBUG
+#include <iostream>
+using std::endl;
+using std::cout;
+
+void node_list::print_node_list()
+{
+	cout<<"============================="<<endl;
+	cout<<"start symbol:\t"<<start<<endl;
+	cout<<"terminals:\n\t";
+	for (unsigned int i = 0; i < terms.size(); i += 1)
+	{
+		cout<<terms[i]<<" ";
+	}
+	cout<<endl;
+	cout<<"non-terminals:\n\t";
+	for (unsigned int i = 0; i < non_terms.size(); i += 1)
+	{
+		cout<<non_terms[i]<<" ";
+	}
+	cout<<endl;
+	for (list<node>::iterator it = rules.begin(); it != rules.end(); it ++)
+	{
+		it->print_node();
+	}
+	cout<<"============================="<<endl;
+}
+#endif

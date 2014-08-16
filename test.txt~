@@ -1,0 +1,20 @@
+
+
+root:
+	%{code_segmt_1}% 
+	child1 
+	%{code_segmt_2}% 
+	child2 
+	%{code_segmt_3}% //comment
+	;
+
+//comment
+
+
+chi1:
+	%{code_segmt_4}%
+	;
+
+chil2:
+	%{code_segmt_5}%
+	;

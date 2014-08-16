@@ -1,0 +1,35 @@
+
+#include <iostream>
+
+/*
+#include "A.h"
+#include "A68.h"
+#include "A500874489.h"
+#include "D1668964.h"
+*/
+
+#include "print_base_h.h"
+
+using std::cout;
+using std::endl;
+
+int main (int argc, char const* argv[])
+{
+/*	A a;
+	A68 a68;
+	A500874489 a500874489;
+	D1668964 d1668964;
+	cout<<endl;
+	a68.print_this(cout);
+	cout<<endl;
+	d1668964.print_this(cout);
+	cout<<endl;
+	a500874489.print_this(cout);
+	cout<<endl;
+*/
+
+	print_base_h p;
+	p.print_this(cout);
+
+	return 0;
+}

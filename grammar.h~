@@ -1,0 +1,43 @@
+#ifndef GRAMMAR_H_
+#define GRAMMAR_H_
+
+
+#include <list>
+#include <string>
+#include <map>
+
+#include "rule.h"
+
+using std::list;
+using std::map;
+
+class grammar
+{
+	public:
+		grammar ();
+		virtual ~grammar ();
+		
+		void insert_nonterminal(const string & a_name, int a_is_nullable);
+		void insert_terminal(const string & a_name, const string & a_usr_type);
+		
+		int is_terminal_symbol(const string & a_name);
+		int is_nonterminal_symbol(const string & a_name);
+		
+		int is_nullable(const string & a_name);
+		string get_usr_type(const string & a_name);
+#ifdef DEBUG
+		void print_grammar();
+#endif
+	
+	public://every context free grammar is a four-tuple
+		//they are nonterminals, terminals, rules and start symbol
+		list<rule> rules;
+		
+		//is_nullable: 1 for 'yes', 0 for 'no'
+		map<string, int> nonterminals;//(symbol_name, is_nullable)
+		map<string, string> terminals;//(symbol_name, usr_type)
+
+		string		start;
+};
+
+#endif

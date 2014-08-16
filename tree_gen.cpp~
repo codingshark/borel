@@ -1,0 +1,14 @@
+#include "tree_gen.h"
+
+tree_gen::tree_gen (const node_list & a_list): backend(a_list)
+{
+}
+
+tree_gen::~tree_gen ()
+{
+}
+
+void tree_gen::code_gen()
+{
+	
+}

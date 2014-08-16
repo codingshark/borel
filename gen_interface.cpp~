@@ -1,0 +1,11 @@
+#include "gen_interface.h"
+
+gen_interface::gen_interface (const grammar & a_cfg):cfg(a_list)
+{
+	
+}
+
+gen_interface::~gen_interface ()
+{
+	
+}

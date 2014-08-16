@@ -1,0 +1,78 @@
+%{
+
+#include <stdio.h>
+#include <string>
+#include <iostream>
+
+using std::string;
+using std::cout;
+using std::endl;
+
+#ifdef YYLEX_PARAM
+int yylex (YYLEX_PARAM);
+#else
+int yylex ();
+#endif
+
+extern "C" int yyerror(const string & s);
+
+extern FILE * yyin;
+extern string lex_str;
+
+%}
+
+%union
+{
+	int stub;
+}
+
+%token EPILOGUE_STMT
+%token PROLOGUE_STMT
+%token DECLARATIONS_STMT
+%token IDENTIFIER
+
+%type <stub> finish
+
+
+%%
+
+finish:
+	finish EPILOGUE_STMT			{cout<<"EPI:\t"<<lex_str<<endl;}
+|	finish PROLOGUE_STMT			{cout<<"PRO:\t"<<lex_str<<endl;}
+|	finish DECLARATIONS_STMT		{cout<<"DEC:\t"<<lex_str<<endl;}
+|	EPILOGUE_STMT			{cout<<"EPI:\t"<<lex_str<<endl;}
+|	PROLOGUE_STMT			{cout<<"PRO:\t"<<lex_str<<endl;}
+|	DECLARATIONS_STMT		{cout<<"DEC:\t"<<lex_str<<endl;}
+	;
+
+
+%%
+
+int yyerror(const string & s)
+{
+    cout<<s<<endl;
+    return 1;
+}
+
+main(int argc, char ** argv)
+{
+
+	if(argc != 2)
+	{
+		cout<<argv[0]<<" grammar file"<<endl;
+		return 0;
+	}
+
+	FILE *f = fopen(argv[1], "r");
+	if(!f) {
+		cout<<"\tERROR:cannot open grammar file!"<<endl;
+	}
+	yyin = f;
+	yyparse();
+
+	cout<<"finish parsing"<<endl;
+	fclose(f);
+
+	return 0;
+
+}

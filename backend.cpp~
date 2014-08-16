@@ -1,0 +1,163 @@
+#include "backend.h"
+
+#include <iostream>
+#include "tree_gen.h"
+
+using std::cout;
+using std::endl;
+
+backend::backend (grammar & a_cfg): cfg(a_cfg)
+{
+	gen = NULL;
+}
+
+backend::~backend ()
+{
+	if(gen != NULL)
+	{
+		delete gen;
+		gen = NULL;
+	}
+}
+
+void backend::generate_output()
+{
+	initialize();
+
+	cfg.print_grammar();
+	
+	gen = new tree_gen(cfg);
+	if(gen == NULL)
+	{
+		cout<<"***error: cannot allocate tree_gen"<<endl;
+		return;
+	}
+	gen->code_gen();
+	return;
+}
+
+void backend::find_nullable()
+{
+	unsigned int null_production_count = 0;
+	for (list<rule>::iterator it = cfg.rules.begin(); it != cfg.rules.end(); it++)
+	{
+		null_production_count = 0;
+		for (list<list<rule::symbol> >::iterator jt = it->productions.begin();
+			jt != it->productions.end(); jt ++)
+		{
+			if(jt->size() == 0)
+			{//A -> epsilon
+				cfg.insert_nonterminal(it->name, 1);
+				null_production_count++;
+			}
+		}
+		if(null_production_count > 1)
+		{
+			cout<<"***semantic error: "<<it->name<<" redundency null production rules."<<endl;
+		}
+	}
+
+	int continue_loop;
+	do{
+		continue_loop = 0;
+		for (list<rule>::iterator it = cfg.rules.begin(); it != cfg.rules.end(); it ++)
+		{//for every non-terminal symbol
+			if(cfg.is_nullable(it->name) == 0)
+			{//skip those that has been marked
+				for (list<list<rule::symbol> >::iterator jt = it->productions.begin(); 
+					jt != it->productions.end(); jt ++)
+				{//for every production rule
+					null_production_count = 0;
+					for (list<rule::symbol>::iterator kt = jt->begin(); kt != jt->end(); kt ++)
+					{//for every symbol of a production rule
+						if(kt->cfg_type != RULE_TYPE)
+						{//not a non-terminal symbol, so this production must be not a nullable rule
+							break;
+						}else
+						{
+							if(cfg.is_nullable(kt->name) == 0)
+							{//a non-terminal symbol, but not nullable
+								break;
+							}else
+							{
+								null_production_count++;
+//cout<<"null_production_count++: "<<cfg.is_nullable(kt->name)<<endl;
+							}
+						}
+					}
+					if((null_production_count > 0) && (null_production_count == jt->size()))
+					{//find a new nullable symbol
+						cfg.insert_nonterminal(it->name, 1);
+						continue_loop = 1;
+						//nullable list has been updated contine iteration
+//cout<<"mark "<<it->name<<endl;
+					}
+				}
+			}
+		}
+	}while(continue_loop);
+	return;
+}
+
+
+void backend::find_nonterminal_symbols()
+{
+
+	for (list<rule>::iterator it = cfg.rules.begin(); it != cfg.rules.end(); it ++)
+	{
+		if(cfg.is_terminal_symbol(it->name))
+		{
+			cout<<"***semantic error: "<<it->name<<" cannot be both a terminal and non-terminal symbol."<<endl;
+		}
+		cfg.insert_nonterminal(it->name, 0);
+	}
+}
+
+void backend::initialize()
+{
+	find_nonterminal_symbols();
+	find_nullable();
+	find_hash_code();
+}
+
+void backend::find_hash_code()
+{
+	std::locale loc;
+	unsigned int j;//offset of production rules
+	string	str_of_rule;
+	const std::collate<char>& coll = std::use_facet<std::collate<char> >(loc);
+	for (list<rule>::iterator it = cfg.rules.begin(); it != cfg.rules.end(); it ++)
+	{
+		j=0;
+		it->hash_code.resize(it->productions.size());
+		for (list<list<rule::symbol> >::iterator jt = it->productions.begin(); 
+			jt != it->productions.end(); jt++, j++)
+		{
+			str_of_rule = "";
+			for (list<rule::symbol>::iterator kt = jt->begin(); 
+				kt != jt->end(); kt++)
+			{
+				str_of_rule += kt->name;
+			}
+cout<<"str_of_rule: "<<str_of_rule<<endl;
+			it->hash_code[j] = coll.hash(str_of_rule.data(),str_of_rule.data()+str_of_rule.length());
+cout<<"";
+		}
+		////check for duplicated rules
+		for (unsigned int m = 0; m < it->hash_code.size() -1; m += 1)
+		{
+			for (unsigned int n = m+1; n < it->hash_code.size(); n += 1)
+			{
+				if(it->hash_code[m] == it->hash_code[n])
+				{
+cout<<"["<<m<<"]: "<<it->hash_code[m]<<" vs ["<<n<<"]: "<<it->hash_code[n]<<endl;
+					cout<<"***semantic error: "<<it->name<<" has duplicated production rules."<<endl;
+				}
+			}
+		}
+		////
+	}
+}
+
+
+

@@ -1,0 +1,64 @@
+#include "A.h"
+#include <iostream>
+A::A()
+{
+	ptr_D = NULL;
+}
+A::A(const A & a_A)
+{
+	bb = a_A.bb;
+	cc = a_A.cc;
+	if( ptr_D != NULL)
+	{
+		ptr_D = a_A.ptr_D->duplicate();
+	}else
+	{
+		ptr_D = NULL;
+	}}
+A::~A()
+{
+	if( ptr_D != NULL)
+	{
+		delete ptr_D;
+	}
+}
+A & A::operator = (const A & a_A)
+{
+	bb = a_A.bb;
+	cc = a_A.cc;
+	if( ptr_D != NULL)
+	{
+		ptr_D = a_A.ptr_D->duplicate();
+	}else
+	{
+		ptr_D = NULL;
+	}}
+std::ostream & operator << (std::ostream & out, const A & a_A)
+{
+	out<< a_A.bb;
+	out<<"and";
+	out<< a_A.cc;
+	out<< *(a_A.ptr_D);
+	return out;
+}
+
+void A::set_bb_STR_cc_D(const int & a_int, const double & a_double, D * a_D)
+{
+	bb =	a_int;
+	cc =	a_double;
+	ptr_D =	a_D;
+}
+
+A * A::duplicate()
+{
+	A * a_copy = new A;
+	a_copy->bb = bb;
+	a_copy->cc = cc;
+	if( ptr_D != NULL)
+	{
+		a_copy->ptr_D = ptr_D->duplicate();
+	}else
+	{
+		a_copy->ptr_D = NULL;
+	}	return a_copy;
+}

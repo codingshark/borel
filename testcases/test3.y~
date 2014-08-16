@@ -1,0 +1,17 @@
+
+
+%type	<>		A
+%token	< int	>	bb
+%token	<double>	cc
+%type	<>		D
+
+%%
+
+A:
+	bb "and" cc D
+	;
+
+D:
+	"end"
+	;
+

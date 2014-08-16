@@ -1,0 +1,21 @@
+#ifndef ARG_TYPE1515850522_H_
+#define ARG_TYPE1515850522_H_
+
+#include "arg_type.h"
+#include "std::string.h"
+class arg_type1515850522 :public arg_type
+{
+	public:
+		arg_type1515850522();
+		arg_type1515850522(const arg_type1515850522 & a_arg_type1515850522);
+		virtual ~arg_type1515850522();
+		arg_type1515850522 & operator = (const arg_type1515850522 & a_arg_type1515850522);
+		void setarg_type1515850522(const std::string & a_data_member_type1);
+
+		void print_this(std::ostream & out);
+	public:
+		arg_type1515850522 * duplicate();
+	private:
+		std::string	data_member_type1;
+};
+#endif

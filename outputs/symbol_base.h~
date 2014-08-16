@@ -1,0 +1,18 @@
+#ifndef SYMBOL_BASE_H_
+#define SYMBOL_BASE_H_
+
+#include <ostream>
+#include <assert.h>
+
+class symbol_base
+{
+	public:
+//		symbol_base (std::ostream & an_out);
+		symbol_base(){};
+		virtual ~symbol_base (){};
+
+	private:
+//		ostream & std::out;
+};
+
+#endif
